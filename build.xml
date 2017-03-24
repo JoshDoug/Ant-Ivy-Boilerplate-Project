@@ -1,0 +1,82 @@
+<!-- A simple example build project for Ant and Ivy -->
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="Ant-Ivy-Boilerplate-Project" default="compile">
+
+<!--
+	This build file is a self contained project that doesn't require anything except
+	Ant with Ivy, and Java installed (1.6.2+, 2.4+, and 1.4+ respectively).
+-->
+	<property name="ivy.install.version" 	value="2.4.0" />
+	<property name="build.dir"		value="build" />
+	<property name="classes.dir"		value="${build.dir}/classes" />
+	<property name="jar.dir"		value="${build.dir}/jar" />
+	<property name="src.dir"		value="src" />
+	<property name="lib.dir"		value="lib" />
+	<property name="config.dir"		value="config" />
+	<property name="main-class"		value="com.joshuastringfellow.PackageTemplate.HelloWorld" />
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+
+	<!-- Compile -->
+	<target name="compile" depends="resolve" description="Compile and run the project">
+		<echo message="Compiling..."/>
+		<mkdir dir="${classes.dir}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+		<copy todir="${classes.dir}">
+			<fileset dir="${config.dir}" />
+		</copy>
+	</target>
+
+	<!-- Jar -->
+	<target name="jar" depends="compile" description="package compiled classes into Jar">
+		<mkdir dir="${jar.dir}" />
+		<jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<path id="application" location="${jar.dir}/${ant.project.name}.jar" />
+
+	<!-- Run -->
+	<target name="run" depends="jar">
+		<java fork="true" classname="${main-class}">
+			<classpath>
+				<path refid="classpath" />
+				<path refid="application" />
+			</classpath>
+		</java>
+	</target>	
+
+	<!-- Run Junit Unit Tests -->
+	<target name="junit" depends="jar">
+		<junit printsummary="yes">
+			<classpath>
+				<path refid="classpath" />
+				<path refid="application" />
+			</classpath>
+			<batchtest fork="yes">
+				<fileset dir="${src.dir}" includes="**/*Test.java" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<!-- Resolve -->
+	<target name="resolve" description="Retreive Ivy Dependencies">
+		<ivy:retrieve type="jar" />
+	</target>
+	
+	<!-- Clean -->
+	<target name="clean" description="--> clean the project">
+		<delete includeemptydirs="true" quiet="true">
+		<fileset dir="${build.dir}"/>
+		</delete>
+	</target>
+
+	<!-- Clean Cache -->
+	<target name="clean-cache" description="--> clean the ivy cache">
+		<ivy:cleancache/>
+	</target>
+</project>
