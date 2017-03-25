@@ -3,23 +3,23 @@
 
 <!--
   This build file is a self contained project that doesn't require anything except
-	Ant with Ivy, and Java installed (1.10.1+, 2.4.0+, and 1.8+ respectively).
+  Ant with Ivy, and Java installed (1.10.1+, 2.4.0+, and 1.8+ respectively).
 -->
-  <property name="build.dir"			value="build" />
-	<property name="classes.dir"		value="${build.dir}/classes" />
-	<property name="main.build.dir"	value="${classes.dir}/main" />
-	<property name="test.build.dir"	value="${classes.dir}/test" />
-	<property name="jar.dir"			  value="${build.dir}/jar" />
-	<property name="src.dir"			  value="src" />
-	<property name="main.src.dir"		value="${src.dir}/main/java" />
-	<property name="test.src.dir"		value="${src.dir}/test/java" />
-	<property name="lib.dir"			  value="lib" />
-	<property name="config.dir"			value="config" />
-	<property name="main-class"			value="com.joshuastringfellow.ProjectTemplate.HelloWorld" />
+  <property name="build.dir"      value="build" />
+  <property name="classes.dir"    value="${build.dir}/classes" />
+  <property name="main.build.dir" value="${classes.dir}/main" />
+  <property name="test.build.dir" value="${classes.dir}/test" />
+  <property name="jar.dir"        value="${build.dir}/jar" />
+  <property name="src.dir"        value="src" />
+  <property name="main.src.dir"   value="${src.dir}/main/java" />
+  <property name="test.src.dir"   value="${src.dir}/test/java" />
+  <property name="lib.dir"        value="lib" />
+  <property name="config.dir"     value="config" />
+  <property name="main-class"     value="com.joshuastringfellow.ProjectTemplate.HelloWorld" />
 
   <path id="classpath">
-		<fileset dir="${lib.dir}" includes="**/*.jar" />
-	</path>
+    <fileset dir="${lib.dir}" includes="**/*.jar" />
+  </path>
 
   <path id="application" location="${jar.dir}/${ant.project.name}.jar" />
 
@@ -29,71 +29,71 @@
     <pathelement location="${main.build.dir}"/>
   </path>
 
-	<!-- Compile -->
-	<target name="compile" description="compile the project">
+  <!-- Compile -->
+  <target name="compile" description="compile the project">
     <mkdir dir="${main.build.dir}"/>
     <javac srcdir="${main.src.dir}" destdir="${main.build.dir}" classpathref="classpath" includeantruntime="false"/>
     <copy todir="${main.build.dir}">
-			<fileset dir="${config.dir}" />
-		</copy>
+      <fileset dir="${config.dir}" />
+    </copy>
   </target>
 
-	<!-- Jar -->
-	<target name="jar" depends="compile" description="package compiled classes into Jar">
-		<mkdir dir="${jar.dir}" />
-		<jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${main.build.dir}">
-			<manifest>
-				<attribute name="Main-Class" value="${main-class}" />
-			</manifest>
-		</jar>
-	</target>
+  <!-- Jar -->
+  <target name="jar" depends="compile" description="package compiled classes into Jar">
+    <mkdir dir="${jar.dir}" />
+    <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${main.build.dir}">
+      <manifest>
+        <attribute name="Main-Class" value="${main-class}" />
+      </manifest>
+    </jar>
+  </target>
 
-	<!-- Run -->
-	<target name="run" depends="jar">
-		<java fork="true" classname="${main-class}">
-			<classpath>
-				<path refid="classpath" />
-				<path refid="application" />
-			</classpath>
-		</java>
-	</target>
+  <!-- Run -->
+  <target name="run" depends="jar">
+    <java fork="true" classname="${main-class}">
+      <classpath>
+        <path refid="classpath" />
+        <path refid="application" />
+      </classpath>
+    </java>
+  </target>
 
-	<!-- Compiles tests -->
+  <!-- Compiles tests -->
   <target name="test-compile" depends="compile">
     <mkdir dir="${test.build.dir}"/>
     <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" includeantruntime="false">
-			<classpath refid="classpath.test" />
-		</javac>
-	</target>
+      <classpath refid="classpath.test" />
+    </javac>
+  </target>
 
-	<!-- Run Junit Unit Tests -->
-	<target name="test" depends="test-compile">
-		<junit printsummary="on" fork="true">
-			<classpath>
-				<path refid="classpath.test" />
-				<pathelement location="${test.build.dir}" />
-			</classpath>
-			<formatter type="brief" usefile="false" />
-			<batchtest fork="yes">
-				<fileset dir="${test.src.dir}" includes="**/*Test.java" />
-			</batchtest>
-		</junit>
-	</target>
+  <!-- Run Junit Unit Tests -->
+  <target name="test" depends="test-compile">
+    <junit printsummary="on" fork="true">
+      <classpath>
+        <path refid="classpath.test" />
+        <pathelement location="${test.build.dir}" />
+      </classpath>
+      <formatter type="brief" usefile="false" />
+      <batchtest fork="yes">
+        <fileset dir="${test.src.dir}" includes="**/*Test.java" />
+      </batchtest>
+    </junit>
+  </target>
 
-	<!-- Resolve -->
-	<target name="resolve" description="Retreive Ivy Dependencies">
-		<ivy:retrieve type="jar" />
-	</target>
-	
-	<!-- Clean -->
-	<target name="clean" description="--> clean the project">
-		<delete includeemptydirs="true" quiet="true">
-		<fileset dir="${build.dir}"/>
-		</delete>
-	</target>
+  <!-- Resolve -->
+  <target name="resolve" description="Retreive Ivy Dependencies">
+    <ivy:retrieve type="jar" />
+  </target>
+  
+  <!-- Clean -->
+  <target name="clean" description="--> clean the project">
+    <delete includeemptydirs="true" quiet="true">
+    <fileset dir="${build.dir}"/>
+    </delete>
+  </target>
 
-	<!-- Clean Cache -->
-	<target name="clean-cache" description="--> clean the ivy cache">
-		<ivy:cleancache/>
-	</target>
+  <!-- Clean Cache -->
+  <target name="clean-cache" description="--> clean the ivy cache">
+    <ivy:cleancache/>
+  </target>
 </project>
