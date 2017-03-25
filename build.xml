@@ -3,42 +3,50 @@
 
 <!--
 	This build file is a self contained project that doesn't require anything except
-	Ant with Ivy, and Java installed (1.6.2+, 2.4+, and 1.4+ respectively).
+	Ant with Ivy, and Java installed (1.10.1+, 2.4.0+, and 1.8+ respectively).
 -->
-	<property name="ivy.install.version" 	value="2.4.0" />
-	<property name="build.dir"		value="build" />
+	<property name="build.dir"			value="build" />
 	<property name="classes.dir"		value="${build.dir}/classes" />
-	<property name="jar.dir"		value="${build.dir}/jar" />
-	<property name="src.dir"		value="src" />
-	<property name="lib.dir"		value="lib" />
-	<property name="config.dir"		value="config" />
-	<property name="main-class"		value="com.joshuastringfellow.PackageTemplate.HelloWorld" />
+	<property name="main.build.dir"	value="${classes.dir}/main" />
+	<property name="test.build.dir"	value="${classes.dir}/test" />
+	<property name="jar.dir"			  value="${build.dir}/jar" />
+	<property name="src.dir"			  value="src" />
+	<property name="main.src.dir"		value="${src.dir}/main/java" />
+	<property name="test.src.dir"		value="${src.dir}/test/java" />
+	<property name="lib.dir"			  value="lib" />
+	<property name="config.dir"			value="config" />
+	<property name="main-class"			value="com.joshuastringfellow.PackageTemplate.HelloWorld" />
 
-	<path id="classpath">
+  <path id="classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar" />
 	</path>
 
+  <path id="application" location="${jar.dir}/${ant.project.name}.jar" />
+
+  <path id="classpath.test">
+    <pathelement location="lib/junit-4.12.jar"/>
+    <pathelement location="lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${main.build.dir}"/>
+  </path>
+
 	<!-- Compile -->
-	<target name="compile" depends="resolve" description="Compile and run the project">
-		<echo message="Compiling..."/>
-		<mkdir dir="${classes.dir}"/>
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
-		<copy todir="${classes.dir}">
+	<target name="compile" description="compile the project">
+    <mkdir dir="${main.build.dir}"/>
+    <javac srcdir="${main.src.dir}" destdir="${main.build.dir}" classpathref="classpath" includeantruntime="false"/>
+    <copy todir="${main.build.dir}">
 			<fileset dir="${config.dir}" />
 		</copy>
-	</target>
+  </target>
 
 	<!-- Jar -->
 	<target name="jar" depends="compile" description="package compiled classes into Jar">
 		<mkdir dir="${jar.dir}" />
-		<jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+		<jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${main.build.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}" />
 			</manifest>
 		</jar>
 	</target>
-
-	<path id="application" location="${jar.dir}/${ant.project.name}.jar" />
 
 	<!-- Run -->
 	<target name="run" depends="jar">
@@ -48,17 +56,26 @@
 				<path refid="application" />
 			</classpath>
 		</java>
-	</target>	
+	</target>
+
+	<!-- Compiles tests -->
+  <target name="test-compile" depends="compile">
+    <mkdir dir="${test.build.dir}"/>
+    <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" includeantruntime="false">
+			<classpath refid="classpath.test" />
+		</javac>
+	</target>
 
 	<!-- Run Junit Unit Tests -->
-	<target name="junit" depends="jar">
-		<junit printsummary="yes">
+	<target name="test" depends="test-compile">
+		<junit printsummary="on" fork="true">
 			<classpath>
-				<path refid="classpath" />
-				<path refid="application" />
+				<path refid="classpath.test" />
+				<pathelement location="${test.build.dir}" />
 			</classpath>
+			<formatter type="brief" usefile="false" />
 			<batchtest fork="yes">
-				<fileset dir="${src.dir}" includes="**/*Test.java" />
+				<fileset dir="${test.src.dir}" includes="**/*Test.java" />
 			</batchtest>
 		</junit>
 	</target>

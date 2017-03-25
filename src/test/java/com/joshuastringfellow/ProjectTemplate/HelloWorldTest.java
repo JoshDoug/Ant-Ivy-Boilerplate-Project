@@ -1,13 +1,13 @@
-package com.joshuastringfellow.PackageTemplate;
+package com.joshuastringfellow.ProjectTemplate;
 
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class HelloWorldTest {
 
-/*	@Test
+	@Test
 	public void testNothing() {
-	}*/
+	}
 
 	@Test
 	public void testWillAlwaysFail() {

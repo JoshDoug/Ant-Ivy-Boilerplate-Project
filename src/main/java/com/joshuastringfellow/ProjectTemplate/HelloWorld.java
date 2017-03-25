@@ -1,4 +1,4 @@
-package com.joshuastringfellow.PackageTemplate;
+package com.joshuastringfellow.ProjectTemplate;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.Logger;
